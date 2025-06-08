@@ -1,18 +1,18 @@
 import React from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Image } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../Navigation/AppNavigator';
 
 export default function LoginScreen() {
-  const navigation = useNavigation<any>();
-
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   return (
     <View style={styles.container}>
-      <Image source={require('../../assets/logo.png')} style={styles.logo} />
       <Text style={styles.title}>NoMeOlvides</Text>
       <TextInput style={styles.input} placeholder="Correo electrónico" />
       <TextInput style={styles.input} placeholder="Contraseña" secureTextEntry />
-      <Button title="Ingresar" onPress={() => navigation.navigate('Home')} />
+      <Button title="Ingresar" onPress={() => navigation.navigate('HomeTabs')} />
     </View>
   );
 }
@@ -24,11 +24,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     backgroundColor: '#F0F4FF',
-  },
-  logo: {
-    width: 100,
-    height: 100,
-    marginBottom: 20,
   },
   title: {
     fontSize: 24,
