@@ -9,6 +9,8 @@ interface Reminder {
 interface ReminderContextProps {
   reminders: Reminder[];
   addReminder: (reminder: Reminder) => void;
+  updateReminder: (id: string, updated: { emoji: string; text: string }) => void;
+  deleteReminder: (id: string) => void;
 }
 
 const ReminderContext = createContext<ReminderContextProps | undefined>(undefined);
@@ -30,8 +32,20 @@ export const ReminderProvider = ({ children }: { children: ReactNode }) => {
     setReminders((prev) => [...prev, reminder]);
   };
 
+  const updateReminder = (id: string, updated: { emoji: string; text: string }) => {
+    setReminders((prev) =>
+      prev.map((reminder) =>
+        reminder.id === id ? { ...reminder, emoji: updated.emoji, text: updated.text } : reminder
+      )
+    );
+  };
+
+  const deleteReminder = (id: string) => {
+    setReminders((prev) => prev.filter((reminder) => reminder.id !== id));
+  };
+
   return (
-    <ReminderContext.Provider value={{ reminders, addReminder }}>
+    <ReminderContext.Provider value={{ reminders, addReminder, updateReminder, deleteReminder }}>
       {children}
     </ReminderContext.Provider>
   );

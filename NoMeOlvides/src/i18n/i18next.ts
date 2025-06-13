@@ -3,16 +3,6 @@ import { initReactI18next } from 'react-i18next';
 
 i18n.use(initReactI18next).init({
   resources: {
-    en: {
-      translation: {
-        current_mode: 'Current Mode',
-        dark: 'Dark',
-        light: 'Light',
-        toggle_theme: 'Toggle Theme',
-        choose_color: 'Choose Color',
-        choose_language: 'Choose Language',
-      },
-    },
     es: {
       translation: {
         current_mode: 'Modo Actual',
@@ -24,8 +14,8 @@ i18n.use(initReactI18next).init({
       },
     },
   },
-  lng: 'en', // idioma por defecto
-  fallbackLng: 'en',
+  lng: 'es',
+  fallbackLng: 'es',
   interpolation: { escapeValue: false },
 });
 

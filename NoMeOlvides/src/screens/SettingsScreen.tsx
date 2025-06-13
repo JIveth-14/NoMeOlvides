@@ -1,47 +1,18 @@
 import React from 'react';
-import { View, Text, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Button, StyleSheet } from 'react-native';
 import { useThemeContext } from '../../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
 
 export default function SettingsScreen() {
   const { theme, toggleTheme } = useThemeContext();
-
-  const setCustomColors = (themeOption: { name: string; backgroundColor: string; textColor: string }) => {
-    console.warn('setCustomColors not implemented', themeOption);
-  };
-  const { t, i18n } = useTranslation();
-
-  const colorThemes = [
-    { name: 'Azul', backgroundColor: '#E6F0FF', textColor: '#003366' },
-    { name: 'Verde', backgroundColor: '#E6FFEC', textColor: '#006633' },
-    { name: 'Rosa', backgroundColor: '#FFE6F0', textColor: '#99004C' },
-  ];
-
-  const changeLanguage = (lang: string) => {
-    i18n.changeLanguage(lang);
-  };
+  const { t } = useTranslation();
 
   return (
-    <View style={[styles.container]}>
-      <Text style={styles.text}>{t('current_mode')}: {theme === 'dark' ? t('dark') : t('light')}</Text>
-      <Button title={t('toggle_theme')} onPress={toggleTheme} />
-
-      <Text style={[styles.text, { marginTop: 30 }]}>{t('choose_color')}</Text>
-      {colorThemes.map((themeOption) => (
-        <TouchableOpacity
-          key={themeOption.name}
-          style={[styles.colorButton, { backgroundColor: themeOption.backgroundColor }]}
-          onPress={() => setCustomColors(themeOption)}
-        >
-          <Text style={{ color: themeOption.textColor }}>{themeOption.name}</Text>
-        </TouchableOpacity>
-      ))}
-
-      <Text style={[styles.text, { marginTop: 30 }]}>{t('choose_language')}</Text>
-      <View style={styles.languageButtons}>
-        <Button title="Español" onPress={() => changeLanguage('es')} />
-        <Button title="English" onPress={() => changeLanguage('en')} />
-      </View>
+    <View style={styles.container}>
+      <Text style={styles.text}>
+        {t('Cambiar Tema ')}: {theme === 'dark' ? t('dark') : t('light')}
+      </Text>
+      <Button title={t('Cambiar')} onPress={toggleTheme} />
     </View>
   );
 }
@@ -56,17 +27,5 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 18,
     marginBottom: 10,
-  },
-  colorButton: {
-    padding: 10,
-    marginVertical: 5,
-    borderRadius: 8,
-    width: 200,
-    alignItems: 'center',
-  },
-  languageButtons: {
-    flexDirection: 'row',
-    gap: 10,
-    marginTop: 10,
   },
 });
