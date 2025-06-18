@@ -9,14 +9,24 @@ i18n.use(initReactI18next).init({
         dark: 'Oscuro',
         light: 'Claro',
         toggle_theme: 'Cambiar Tema',
-        choose_color: 'Elegir Color',
         choose_language: 'Elegir Idioma',
       },
     },
+    en: {
+      translation: {
+        current_mode: 'Current Mode',
+        dark: 'Dark',
+        light: 'Light',
+        toggle_theme: 'Toggle Theme',
+        choose_language: 'Choose Language',
+      },
+    },
   },
-  lng: 'es',
-  fallbackLng: 'es',
-  interpolation: { escapeValue: false },
+  lng: 'es', 
+  fallbackLng: 'en', 
+  interpolation: {
+    escapeValue: false,
+  },
 });
 
 export default i18n;
