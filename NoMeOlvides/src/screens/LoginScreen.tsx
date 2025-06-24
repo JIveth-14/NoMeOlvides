@@ -33,11 +33,42 @@ export default function LoginScreen() {
     return email.trim() !== '' && isValidEmail(email) && password.trim() !== '';
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
+    const [isAllowed, setIsAllowed] = useState(false);
     Keyboard.dismiss();
     if (!isFormValid()) {
       Alert.alert('Error', 'Por favor completa los campos correctamente.');
     } else {
+
+      try {
+        const response = await fetch('http://172.20.10.3:3001/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          alert(data.error || 'Error al iniciar sesión');
+          setEmail('');
+          setPassword('');
+          setIsAllowed(false);
+          return;
+        }
+
+        setEmail(data.user.email);
+        setPassword(data.user.password);
+        setIsAllowed(true);
+      } catch (error: any) {
+        alert('Error al conectar con el servidor: ' + error.message);
+        setEmail('');
+        setPassword('');
+        setIsAllowed(false);
+      }
+
       navigation.navigate('HomeTabs');
     }
   };
@@ -52,53 +83,53 @@ export default function LoginScreen() {
 
   return (
 
-      <View style={styles.container}>
-             <Image source={require('../../assets/icon.jpeg')} style={{ width: 100, height: 100, marginBottom: 20 }} />
-        <Text style={styles.title}>NoMeOlvides</Text>
-        
-        <TextInput
-          style={styles.input}
-          placeholder="Correo electrónico"
-          value={email}
-          onChangeText={setEmail}
-          onBlur={() => setTouched({ ...touched, email: true })}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-    
+    <View style={styles.container}>
+      <Image source={require('../../assets/icon.jpeg')} style={{ width: 100, height: 100, marginBottom: 20 }} />
+      <Text style={styles.title}>NoMeOlvides</Text>
 
-        {touched.email && email.trim() === '' && (
-          <Text style={styles.errorText}>El correo es obligatorio.</Text>
-        )}
-        {touched.email && email.trim() !== '' && !isValidEmail(email) && (
-          <Text style={styles.errorText}>Formato de correo no válido.</Text>
-        )}
+      <TextInput
+        style={styles.input}
+        placeholder="Correo electrónico"
+        value={email}
+        onChangeText={setEmail}
+        onBlur={() => setTouched({ ...touched, email: true })}
+        keyboardType="email-address"
+        autoCapitalize="none"
+      />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Contraseña"
-          value={password}
-          onChangeText={setPassword}
-          onBlur={() => setTouched({ ...touched, password: true })}
-          secureTextEntry
-        />
-        {touched.password && password.trim() === '' && (
-          <Text style={styles.errorText}>La contraseña es obligatoria.</Text>
-        )}
 
-        <TouchableOpacity
-          style={[
-            styles.customButton,
-            { backgroundColor: isFormValid() ? '#007AFF' : '#AAB2BD' },
-          ]}
-          onPress={handleLogin}
-          disabled={!isFormValid()}
-          activeOpacity={0.8}
-        >
-          <MaterialIcons name="login" size={20} color="#fff" style={{ marginRight: 8 }} />
-          <Text style={{ color: '#fff', fontSize: 16 }}>Ingresar</Text>
-        </TouchableOpacity>
-      </View>
+      {touched.email && email.trim() === '' && (
+        <Text style={styles.errorText}>El correo es obligatorio.</Text>
+      )}
+      {touched.email && email.trim() !== '' && !isValidEmail(email) && (
+        <Text style={styles.errorText}>Formato de correo no válido.</Text>
+      )}
+
+      <TextInput
+        style={styles.input}
+        placeholder="Contraseña"
+        value={password}
+        onChangeText={setPassword}
+        onBlur={() => setTouched({ ...touched, password: true })}
+        secureTextEntry
+      />
+      {touched.password && password.trim() === '' && (
+        <Text style={styles.errorText}>La contraseña es obligatoria.</Text>
+      )}
+
+      <TouchableOpacity
+        style={[
+          styles.customButton,
+          { backgroundColor: isFormValid() ? '#007AFF' : '#AAB2BD' },
+        ]}
+        onPress={handleLogin}
+        disabled={!isFormValid()}
+        activeOpacity={0.8}
+      >
+        <MaterialIcons name="login" size={20} color="#fff" style={{ marginRight: 8 }} />
+        <Text style={{ color: '#fff', fontSize: 16 }}>Ingresar</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
 const styles = StyleSheet.create({

@@ -4,6 +4,7 @@ interface Reminder {
   id: string;
   emoji: string;
   text: string;
+  date: string; 
 }
 
 interface ReminderContextProps {
@@ -23,9 +24,24 @@ export const useReminders = () => {
 
 export const ReminderProvider = ({ children }: { children: ReactNode }) => {
   const [reminders, setReminders] = useState<Reminder[]>([
-    { id: '1', emoji: '🔌', text: 'Llevar cargador' },
-    { id: '2', emoji: '📚', text: 'Regresar libro' },
-    { id: '3', emoji: '🚿', text: 'Cerrar la llave' },
+    {
+      id: '1',
+      emoji: '🔌',
+      text: 'Llevar cargador',
+      date: new Date().toISOString(),
+    },
+    {
+      id: '2',
+      emoji: '📚',
+      text: 'Regresar libro',
+      date: new Date().toISOString(),
+    },
+    {
+      id: '3',
+      emoji: '🚿',
+      text: 'Cerrar la llave',
+      date: new Date().toISOString(),
+    },
   ]);
 
   const addReminder = (reminder: Reminder) => {
@@ -35,7 +51,9 @@ export const ReminderProvider = ({ children }: { children: ReactNode }) => {
   const updateReminder = (id: string, updated: { emoji: string; text: string }) => {
     setReminders((prev) =>
       prev.map((reminder) =>
-        reminder.id === id ? { ...reminder, emoji: updated.emoji, text: updated.text } : reminder
+        reminder.id === id
+          ? { ...reminder, emoji: updated.emoji, text: updated.text }
+          : reminder
       )
     );
   };
@@ -45,7 +63,9 @@ export const ReminderProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <ReminderContext.Provider value={{ reminders, addReminder, updateReminder, deleteReminder }}>
+    <ReminderContext.Provider
+      value={{ reminders, addReminder, updateReminder, deleteReminder }}
+    >
       {children}
     </ReminderContext.Provider>
   );
