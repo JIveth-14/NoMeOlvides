@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Text, Alert, useColorScheme, Platform, Pressable,} from 'react-native';
+import { View, TextInput, Button, StyleSheet, Text, Alert, useColorScheme, Platform, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../Navigation/AppNavigator';
@@ -17,25 +17,50 @@ export default function AddReminderScreen() {
   const theme = useColorScheme();
   const isDark = theme === 'dark';
 
-  const handleSave = () => {
+  const handleChangeDate = (event: any, selectedDate?: Date) => {
+    setShowPicker(false);
+    if (selectedDate) setDate(selectedDate);
+  };
+
+  const handleSave = async () => {
     if (text.trim() === '' || emoji.trim() === '') {
       Alert.alert('Completa todos los campos');
       return;
     }
 
-    addReminder({
-      id: Date.now().toString(),
-      emoji,
-      text,
-      date: date.toISOString(), // Se guarda como string ISO
-    });
+    try {
+      const response = await fetch('https://proyectobasebackend.onrender.com/api/reminder/newreminders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          emoji,
+          text,
+          date: date.toISOString(),
+        }),
+      });
 
-    navigation.goBack();
-  };
+      const data = await response.json();
 
-  const handleChangeDate = (event: any, selectedDate?: Date) => {
-    setShowPicker(false);
-    if (selectedDate) setDate(selectedDate);
+      if (!response.ok) {
+        Alert.alert('Error', data.error || 'Error al guardar recordatorio');
+        return;
+      }
+
+      // Actualizar contexto local con el id que devuelve Supabase
+      addReminder({
+        id: data.data[0].id.toString(), // Ajusta según cómo venga el id
+        emoji,
+        text,
+        date: date.toISOString(),
+      });
+
+      Alert.alert('Éxito', 'Recordatorio guardado correctamente');
+      navigation.goBack();
+
+    } catch (error) {
+      Alert.alert('Error de red', 'No se pudo conectar al servidor');
+      console.error(error);
+    }
   };
 
   return (
@@ -107,4 +132,4 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
   },
-}); 
+});

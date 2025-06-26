@@ -1,10 +1,18 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Alert, Image, TouchableOpacity, Keyboard } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Alert,
+  Image,
+  TouchableOpacity,
+  Keyboard,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../Navigation/AppNavigator';
 import { MaterialIcons } from '@expo/vector-icons';
-
 
 export default function LoginScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -14,15 +22,15 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
+  const [isAllowed, setIsAllowed] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const timeout = setTimeout(() => {
       setLoading(false);
-    }, 2000); // 2 segundos de carga simulada
+    }, 2000); // Simula 2 segundos de carga
 
     return () => clearTimeout(timeout);
   }, []);
-
 
   const isValidEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -30,46 +38,53 @@ export default function LoginScreen() {
   };
 
   const isFormValid = () => {
-    return email.trim() !== '' && isValidEmail(email) && password.trim() !== '';
+    return (
+      (email ?? '').trim() !== '' &&
+      isValidEmail(email ?? '') &&
+      (password ?? '').trim() !== ''
+    );
   };
 
   const handleLogin = async () => {
-    const [isAllowed, setIsAllowed] = useState(false);
     Keyboard.dismiss();
+
     if (!isFormValid()) {
       Alert.alert('Error', 'Por favor completa los campos correctamente.');
-    } else {
+      return;
+    }
 
-      try {
-        const response = await fetch('http://172.20.10.3:3001/api/auth/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email, password }),
-        });
+    try {
+      console.log('Iniciando sesión...');
+      const response = await fetch('https://proyectobasebackend.onrender.com/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-        const data = await response.json();
+      const data = await response.json();
 
-        if (!response.ok) {
-          alert(data.error || 'Error al iniciar sesión');
-          setEmail('');
-          setPassword('');
-          setIsAllowed(false);
-          return;
-        }
-
-        setEmail(data.user.email);
-        setPassword(data.user.password);
-        setIsAllowed(true);
-      } catch (error: any) {
-        alert('Error al conectar con el servidor: ' + error.message);
+      if (!response.ok) {
+        Alert.alert('Error', data.error || 'Error al iniciar sesión');
         setEmail('');
         setPassword('');
         setIsAllowed(false);
+        return;
       }
 
-      navigation.navigate('HomeTabs');
+      if (data.user) {
+        setEmail(data?.user?.email ?? '');
+        setIsAllowed(true);
+        Alert.alert('Éxito', 'Inicio de sesión exitoso');
+        navigation.navigate('HomeTabs');
+      } else {
+        Alert.alert('Error', 'Credenciales incorrectas o incompletas');
+      }
+
+    } catch (error: any) {
+      Alert.alert('Error', 'Error al conectar con el servidor: ' + error.message);
+      setEmail('');
+      setPassword('');
+      setIsAllowed(false);
     }
   };
 
@@ -82,9 +97,11 @@ export default function LoginScreen() {
   }
 
   return (
-
     <View style={styles.container}>
-      <Image source={require('../../assets/icon.jpeg')} style={{ width: 100, height: 100, marginBottom: 20 }} />
+      <Image
+        source={require('../../assets/icon.jpeg')}
+        style={{ width: 100, height: 100, marginBottom: 20 }}
+      />
       <Text style={styles.title}>NoMeOlvides</Text>
 
       <TextInput
@@ -96,12 +113,10 @@ export default function LoginScreen() {
         keyboardType="email-address"
         autoCapitalize="none"
       />
-
-
-      {touched.email && email.trim() === '' && (
+      {touched.email && (email ?? '').trim() === '' && (
         <Text style={styles.errorText}>El correo es obligatorio.</Text>
       )}
-      {touched.email && email.trim() !== '' && !isValidEmail(email) && (
+      {touched.email && (email ?? '').trim() !== '' && !isValidEmail(email ?? '') && (
         <Text style={styles.errorText}>Formato de correo no válido.</Text>
       )}
 
@@ -113,7 +128,7 @@ export default function LoginScreen() {
         onBlur={() => setTouched({ ...touched, password: true })}
         secureTextEntry
       />
-      {touched.password && password.trim() === '' && (
+      {touched.password && (password ?? '').trim() === '' && (
         <Text style={styles.errorText}>La contraseña es obligatoria.</Text>
       )}
 
@@ -123,8 +138,6 @@ export default function LoginScreen() {
           { backgroundColor: isFormValid() ? '#007AFF' : '#AAB2BD' },
         ]}
         onPress={handleLogin}
-        disabled={!isFormValid()}
-        activeOpacity={0.8}
       >
         <MaterialIcons name="login" size={20} color="#fff" style={{ marginRight: 8 }} />
         <Text style={{ color: '#fff', fontSize: 16 }}>Ingresar</Text>
@@ -132,6 +145,7 @@ export default function LoginScreen() {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -161,10 +175,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginBottom: 5,
     marginTop: -5,
-  },
-  buttonContainer: {
-    alignItems: 'center',
-    marginTop: 20,
   },
   customButton: {
     flexDirection: 'row',

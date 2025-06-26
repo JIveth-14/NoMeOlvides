@@ -20,14 +20,19 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.jessica_dubon.NoMeOlvides"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-localization"
-    ]
-    
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "265d966e-c7ac-4ee8-8a32-8b977260f2bc"
+      }
+    }
   }
 }
